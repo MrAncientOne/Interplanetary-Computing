@@ -41,6 +41,24 @@ plt.rcParams.update(
 )
 
 
+def _panellabels(axes, letters=None):
+    """Stamp (a), (b), (c) in the upper-left of each panel.
+
+    Reviewer: panels should be named a/b rather than referred to as
+    "left"/"right" in the caption. The label sits in axes coordinates at the
+    top-left, clear of the data in every panel of every figure here, and costs
+    no title slot. Letters default to a, b, c, ...
+    """
+    if letters is None:
+        letters = [chr(ord("a") + i) for i in range(len(axes))]
+    for ax, ch in zip(axes, letters):
+        # y=0.99 sits above the per-panel annotations that already occupy the
+        # 0.05/0.92 slot in fig_runtime and fig_crossover.
+        ax.text(0.03, 0.99, f"({ch})", transform=ax.transAxes,
+                fontsize=9, va="top", ha="left",
+                bbox=dict(fc="white", ec="none", pad=1.0))
+
+
 def _save(fig, name: str):
     """Save vector (PDF) + high-res raster (PNG) so LaTeX can use PDF."""
     fig.tight_layout(pad=0.6)
@@ -122,6 +140,7 @@ def fig_sign_flip():
     ax.axhline(0, color="k", lw=0.8, ls="--")
     ax.set_xlabel("fragments required $k$")
     ax.legend(fontsize=7, loc="lower left")
+    _panellabels(axes)
     _save(fig, "sign_flip")
 
 
@@ -179,6 +198,7 @@ def fig_crossover():
                 fontsize=8, va="top",
                 bbox=dict(fc="white", ec="none", pad=1))
     axes[0].set_ylabel("critical bandwidth $\\bar{R}^{crit}$ (B/s)")
+    _panellabels(axes)
     _save(fig, "crossover")
 
 
@@ -204,6 +224,7 @@ def fig_runtime():
     axes[1].text(0.05, 0.92, f"fit exponent {r['exponent_relays']:.2f}",
                  transform=axes[1].transAxes, fontsize=8, va="top",
                  bbox=dict(fc="white", ec="none", pad=1))
+    _panellabels(axes)
     _save(fig, "runtime")
 
 
@@ -234,6 +255,7 @@ def fig_ablations():
     axes[0].set_ylim(0.4, 1.05)
     axes[1].bar(x, d, color="#7799bb")
     axes[1].set_ylabel("downlink (GB)")
+    _panellabels(axes)
     _save(fig, "ablations")
 
 
